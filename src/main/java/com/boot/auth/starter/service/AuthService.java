@@ -1,7 +1,8 @@
 package com.boot.auth.starter.service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+
 import java.util.Map;
 
 public interface AuthService {
@@ -19,7 +20,7 @@ public interface AuthService {
      * @see com.boot.auth.starter.common.AuthConstant parameters  放入的key值参考这里
      * 需要额外放入内容请传入 com.boot.auth.starter.common.AuthConstant.SESSION_OBJECT 扩展字段
      */
-    String auth(String group, String userNo, String roles, Map<String, Object> parameters, HttpServletResponse response, HttpServletRequest request) throws Exception;
+    String auth(String group, String userNo, String roles, Map<String, Object> parameters, ServerHttpResponse response, ServerHttpRequest request) throws Exception;
 
     /**
      * 检测token是否有效
@@ -27,7 +28,7 @@ public interface AuthService {
      * @param request HttpServletRequest
      * @return true 有效
      */
-    Boolean checkToken(HttpServletRequest request);
+    Boolean checkToken(ServerHttpRequest request);
 
     /**
      * 解析 token
@@ -35,7 +36,7 @@ public interface AuthService {
      * @param request HttpServletRequest
      * @return token内容
      */
-    Map<String, String> analysisToken(HttpServletRequest request);
+    Map<String, String> analysisToken(ServerHttpRequest request);
 
     /**
      * 解析 token
@@ -51,6 +52,5 @@ public interface AuthService {
      * @param response http response
      * @param request  http request
      */
-    Boolean deleteAuth(HttpServletResponse response, HttpServletRequest request);
-
+    Boolean deleteAuth(ServerHttpResponse response, ServerHttpRequest request);
 }

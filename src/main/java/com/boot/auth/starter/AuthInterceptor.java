@@ -10,21 +10,23 @@ import com.boot.auth.starter.common.Session;
 import com.boot.auth.starter.model.OperLogAnnotationEntity;
 import com.boot.auth.starter.service.AuthService;
 import com.boot.auth.starter.service.LogService;
-import com.boot.auth.starter.utils.IPUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class AuthInterceptor extends HandlerInterceptorAdapter {
+public class AuthInterceptor implements WebFilter {
     private final static org.slf4j.Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
     private final SessionResolver sessionResolver;
     private final String loginRequired;
@@ -48,7 +50,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(ServerHttpRequest request, ServerHttpResponse response, Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
@@ -84,13 +86,13 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
         if (logicSession == null || !logicSession.getValidLogin()) {
             //未登录
             send(response, loginRequired);
-            log.warn("用户未登录,拒绝访问[" + request.getRequestURI() + "]");
+            log.warn("用户未登录,拒绝访问[" + request + "]");
             return false;
         }
         if (!logicSession.getValidToken()) {
             //token失效
             send(response, tokenInvalid);
-            log.warn("用户token失效,拒绝访问[" + request.getRequestURI() + "]");
+            log.warn("用户token失效,拒绝访问[" + request.getURI() + "]");
             return false;
         }
         //开始校验权限
@@ -100,17 +102,17 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
         Optional<String> optionalRole = Arrays.stream(auth.roles()).filter(roles::contains).findFirst();
         if (!optionalRole.isPresent()) {
             send(response, authNoInvalid);
-            log.warn("用户不具备访问权限,拒绝访问[" + request.getRequestURI() + "]");
+            log.warn("用户不具备访问权限,拒绝访问[" + request.getURI() + "]");
             return false;
         }
         requestAttribute(request, logicSession);
         return true;
     }
 
-    private void requestAttribute(HttpServletRequest request, LogicSession logicSession) {
+    private void requestAttribute(ServerHttpRequest request, LogicSession logicSession) {
         if (logicSession == null) return;
         Optional<Session> sessionOptional = logicSession.getSessionOptional();
-        sessionOptional.ifPresent(s -> request.setAttribute(AuthConstant.ATTR_SESSION, s));
+        sessionOptional.ifPresent(s -> request.getQueryParams().put(AuthConstant.ATTR_SESSION, s));
     }
 
     /**
@@ -120,7 +122,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
      * @param json     输出的json信息
      * @throws Exception
      */
-    private void send(HttpServletResponse response, String json) throws Exception {
+    private void send(ServerHttpResponse response, String json) throws Exception {
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().write(json);
         response.getWriter().close();
@@ -129,10 +131,10 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
     /**
      * 获得session
      *
-     * @param request HttpServletRequest
+     * @param request ServerHttpRequest
      * @return 返回逻辑session对象
      */
-    private LogicSession getSession(HttpServletResponse response, HttpServletRequest request) {
+    private LogicSession getSession(ServerHttpResponse response, ServerHttpRequest request) {
         try {
             return sessionResolver.resolve(authService.analysisToken(request),
                     getHeaderValue(request, AuthConstant.HEADER_KEY_PLATFORM),
@@ -147,7 +149,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
     /**
      * 记录用户操作日志
      */
-    private void saveOperLog(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    private void saveOperLog(ServerHttpRequest request, ServerHttpResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             OperLog operLog = handlerMethod.getMethod().getDeclaringClass().getAnnotation(OperLog.class);
@@ -180,11 +182,11 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
     /**
      * 获取 header的内容
      *
-     * @param request HttpServletRequest
+     * @param request ServerHttpRequest
      * @param key     key
      * @return 返回对应的值
      */
-    private String getHeaderValue(HttpServletRequest request, String key) {
+    private String getHeaderValue(ServerHttpRequest request, String key) {
         String value = "";
         try {
             value = request.getHeader(key);
@@ -195,8 +197,18 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+    public void afterCompletion(ServerHttpRequest request, ServerHttpResponse response, Object handler,
                                 @Nullable Exception ex) throws Exception {
         saveOperLog(request, response, handler);
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        long startTime = System.currentTimeMillis();
+        return chain.filter(exchange).doFinally(signalType -> {
+            long totalTime = System.currentTimeMillis() - startTime;
+            exchange.getAttributes().put("totalTime", totalTime);
+            System.out.println(totalTime);
+        });
     }
 }

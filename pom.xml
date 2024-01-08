@@ -5,27 +5,29 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.4.RELEASE</version>
+        <version>3.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.liuchengts</groupId>
-    <artifactId>spring-boot-auth-starter</artifactId>
-    <version>1.0.7.4</version>
+    <artifactId>spring-boot-webflux-auth-starter</artifactId>
+    <version>1.0.0.0</version>
     <packaging>jar</packaging>
-    <name>spring-boot-auth-starter</name>
-    <description>基于springboot的权限验证</description>
+    <name>spring-boot-webflux-auth-starter</name>
+    <description>基于springboot webflux的权限验证</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <!--plugin-->
-        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
-        <maven-gpg-plugin.version>1.1</maven-gpg-plugin.version>
-        <maven-javadoc-plugin.version>3.1.1</maven-javadoc-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+        <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
+        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
+        <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
+        <guava.version>33.0.0-jre</guava.version>
     </properties>
     <!-- 许可证 -->
     <licenses>
@@ -39,14 +41,14 @@
     <!-- 问题管理 -->
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/liuchengts/spring-boot-auth-starter/issues</url>
+        <url>https://github.com/liuchengts/spring-boot-webflux-auth-starter/issues</url>
     </issueManagement>
     <!-- SCM(Source Control Management)标签允许你配置你的代码库，供 Maven web 站点和其它插件使用。 -->
     <scm>
         <tag>master</tag>
-        <url>git@github.com:liuchengts/spring-boot-auth-starter.git</url>
-        <connection>scm:git:git@github.com:liuchengts/spring-boot-auth-starter.git</connection>
-        <developerConnection>scm:git:git@github.com:liuchengts/spring-boot-auth-starter.git</developerConnection>
+        <url>git@github.com:liuchengts/spring-boot-webflux-auth-starter.git</url>
+        <connection>scm:git:git@github.com:liuchengts/spring-boot-webflux-auth-starter.git</connection>
+        <developerConnection>scm:git:git@github.com:liuchengts/spring-boot-webflux-auth-starter.git</developerConnection>
     </scm>
     <!-- 项目开发者列表 -->
     <developers>
@@ -64,19 +66,19 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
+            <version>${bcprov-jdk15on.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.1-jre</version>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 

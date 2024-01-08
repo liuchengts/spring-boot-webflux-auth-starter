@@ -11,11 +11,11 @@ import com.boot.auth.starter.utils.CookieUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String auth(String group, String userNo, String roles, Map<String, Object> parameters,
-                       HttpServletResponse response, HttpServletRequest request) throws Exception {
+                       ServerHttpResponse response, ServerHttpRequest request) throws Exception {
         try {
             Map<String, String> oldTokenMap = analysisToken(request);
             //删除原有的token
@@ -59,11 +59,11 @@ public class AuthServiceImpl implements AuthService {
         cacheService.put(authProperties.getTokenPrefix() + key, objectMapper.writeValueAsString(parameters),
                 authProperties.getOverdueTime());
         CookieUtils.setCookie(request, response, TOKEN_NAME, token, authProperties.getOverdueTime().intValue());
-        response.setHeader(TOKEN_NAME, token);
+        response.getHeaders().set(TOKEN_NAME, token);
         return token;
     }
 
-    private void delToken(Map<String, String> oldTokenMap, HttpServletResponse response, HttpServletRequest request) {
+    private void delToken(Map<String, String> oldTokenMap, ServerHttpResponse response, ServerHttpRequest request) {
         if (oldTokenMap.isEmpty() || !oldTokenMap.containsKey(AuthConstant.MAP_KEY_KEY)) return;
         if (authProperties.getEnableExclude()) {
             cacheService.remove(authProperties.getTokenPrefix() + oldTokenMap.get(AuthConstant.MAP_KEY_KEY));
@@ -72,8 +72,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Map<String, String> analysisToken(HttpServletRequest request) {
-        String token = request.getHeader(TOKEN_NAME);
+    public Map<String, String> analysisToken(ServerHttpRequest request) {
+        String token = request.getHeaders().getFirst(TOKEN_NAME);
         if (StringUtils.isEmpty(token)) token = CookieUtils.getCookieValue(request, TOKEN_NAME);
         return analysisToken(token);
     }
@@ -117,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Boolean deleteAuth(HttpServletResponse response, HttpServletRequest request) {
+    public Boolean deleteAuth(ServerHttpResponse response, ServerHttpRequest request) {
         try {
             delToken(analysisToken(request), response, request);
             return true;
@@ -127,13 +127,13 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private void delToken(HttpServletResponse response, HttpServletRequest request) {
-        response.setHeader(TOKEN_NAME, "");
+    private void delToken(ServerHttpResponse response, ServerHttpRequest request) {
+        response.getHeaders().remove(TOKEN_NAME);
         CookieUtils.deleteCookie(request, response, TOKEN_NAME);
     }
 
     @Override
-    public Boolean checkToken(HttpServletRequest request) {
+    public Boolean checkToken(ServerHttpRequest request) {
         Map<String, String> tokenMap;
         try {
             tokenMap = analysisToken(request);
