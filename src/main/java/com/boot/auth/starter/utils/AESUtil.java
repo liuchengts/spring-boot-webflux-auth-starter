@@ -12,7 +12,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.util.Base64;
 
 public final class AESUtil {
     private final static org.slf4j.Logger log = LoggerFactory.getLogger(AESUtil.class);
