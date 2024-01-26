@@ -9,7 +9,7 @@
 * 其他方式的缓存方案请参考   [spring-boot-auth-starter README.md](https://github.com/liuchengts/spring-boot-auth-starter/blob/master/README.md)
 ## 一、使用前需要的准备
 
-* maven中央仓库地址 [其他方式集成](https://search.maven.org/artifact/com.github.liuchengts/spring-boot-webflux-auth-starter)
+* maven中央仓库地址 [其他方式集成](https://search.maven.org/artifact/io.github.liuchengts/spring-boot-webflux-auth-starter)
 
 ```
 <dependency>
