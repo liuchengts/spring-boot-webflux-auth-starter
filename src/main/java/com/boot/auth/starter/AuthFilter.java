@@ -12,6 +12,7 @@ import com.boot.auth.starter.service.AuthService;
 import com.boot.auth.starter.service.LogService;
 import com.boot.auth.starter.utils.IPUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
+@Order(-1)
 @Component
 public class AuthFilter implements WebFilter {
     private final static org.slf4j.Logger log = LoggerFactory.getLogger(AuthFilter.class);
