@@ -9,6 +9,7 @@ import com.boot.auth.starter.common.LogicSession;
 import com.boot.auth.starter.common.Session;
 import com.boot.auth.starter.model.OperLogAnnotationEntity;
 import com.boot.auth.starter.service.AuthService;
+import com.boot.auth.starter.service.FilterWhiteListService;
 import com.boot.auth.starter.service.LogService;
 import com.boot.auth.starter.utils.IPUtils;
 import org.slf4j.LoggerFactory;
@@ -29,17 +30,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 @Order(-1)
 @Component
 public class AuthFilter implements WebFilter {
     private final static org.slf4j.Logger log = LoggerFactory.getLogger(AuthFilter.class);
-    private final SessionResolver sessionResolver;
-    private final String loginRequired;
-    private final String tokenInvalid;
-    private final String authNoInvalid;
-    private final AuthService authService;
-    private final LogService logService;
-    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    final
+    SessionResolver sessionResolver;
+    String loginRequired;
+    String tokenInvalid;
+    String authNoInvalid;
+    AuthService authService;
+    LogService logService;
+    RequestMappingHandlerMapping requestMappingHandlerMapping;
+    FilterWhiteListService filterWhiteListService;
 
     public AuthFilter(SessionResolver sessionResolver,
                       String loginRequired,
@@ -47,6 +51,7 @@ public class AuthFilter implements WebFilter {
                       String authNoInvalid,
                       AuthService authService,
                       LogService logService,
+                      FilterWhiteListService filterWhiteListService,
                       RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.sessionResolver = sessionResolver;
         this.loginRequired = loginRequired;
@@ -54,6 +59,7 @@ public class AuthFilter implements WebFilter {
         this.authNoInvalid = authNoInvalid;
         this.authService = authService;
         this.logService = logService;
+        this.filterWhiteListService = filterWhiteListService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
     }
 
@@ -63,10 +69,14 @@ public class AuthFilter implements WebFilter {
             HandlerMethod handlerMethod;
             if (!(handler instanceof HandlerMethod)) {
                 return chain.filter(exchange);
-            } else {
-                handlerMethod = (HandlerMethod) handler;
             }
             ServerHttpRequest request = exchange.getRequest();
+            String path = request.getPath().value();
+            if (filterWhiteListService.isWhiteList(path)) {
+                log.debug("[" + path + "]WhiteList:true");
+                return chain.filter(exchange);
+            }
+            handlerMethod = (HandlerMethod) handler;
             ServerHttpResponse response = exchange.getResponse();
             LogicSession logicSession = getSession(response, request);
             Auth auth = handlerMethod.getMethod().getDeclaringClass().getAnnotation(Auth.class);
