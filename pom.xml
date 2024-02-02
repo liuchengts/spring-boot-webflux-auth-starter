@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.github.liuchengts</groupId>
     <artifactId>spring-boot-webflux-auth-starter</artifactId>
-    <version>1.0.0.1</version>
+    <version>1.0.0.2</version>
     <packaging>jar</packaging>
     <name>spring-boot-webflux-auth-starter</name>
     <description>基于springboot webflux的权限验证</description>

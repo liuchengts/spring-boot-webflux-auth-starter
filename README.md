@@ -76,3 +76,4 @@
 
 * 1.0.0.0 根据 [spring-boot-auth-starter-1.0.7.4](https://github.com/liuchengts/spring-boot-auth-starter) 更改 `servlet` 为`webflux`
 * 1.0.0.1 增加白名单功能、暂不实现日志记录功能
+* 1.0.0.2 修复cookie工具bug
