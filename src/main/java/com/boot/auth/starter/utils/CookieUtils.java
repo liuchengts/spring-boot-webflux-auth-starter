@@ -38,7 +38,7 @@ public final class CookieUtils {
      */
     public static String getCookieValue(ServerHttpRequest request, String cookieName, boolean isDecoder) {
         MultiValueMap<String, HttpCookie> cookieMap = request.getCookies();
-        if (!cookieMap.containsKey(cookieName)) return null;
+        if (cookieMap.isEmpty() || !cookieMap.containsKey(cookieName)) return null;
         HttpCookie cookie = cookieMap.getFirst(cookieName);
         if (cookie == null) return null;
         String retValue = cookie.getValue();
@@ -112,7 +112,7 @@ public final class CookieUtils {
     public static void deleteCookie(ServerHttpRequest request, ServerHttpResponse response,
                                     String cookieName) {
         MultiValueMap<String, HttpCookie> cookieMap = request.getCookies();
-        if (!cookieMap.containsKey(cookieName)) return;
+        if (cookieMap.isEmpty() || !cookieMap.containsKey(cookieName)) return;
         cookieMap.remove(cookieName);
     }
 
