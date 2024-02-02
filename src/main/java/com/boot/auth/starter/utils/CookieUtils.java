@@ -113,7 +113,7 @@ public final class CookieUtils {
                                     String cookieName) {
         MultiValueMap<String, HttpCookie> cookieMap = request.getCookies();
         if (cookieMap.isEmpty() || !cookieMap.containsKey(cookieName)) return;
-        cookieMap.remove(cookieName);
+        response.getCookies().remove(cookieName);
     }
 
     /**
