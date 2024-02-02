@@ -15,7 +15,7 @@
 <dependency>
     <groupId>io.github.liuchengts</groupId>
     <artifactId>spring-boot-webflux-auth-starter</artifactId>
-    <version>1.0.0.1</version>
+    <version>1.0.0.2</version>
 </dependency>
 ```
 ## 二、使用
