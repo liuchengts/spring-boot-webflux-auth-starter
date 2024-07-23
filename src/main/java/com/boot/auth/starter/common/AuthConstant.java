@@ -4,7 +4,7 @@ public interface AuthConstant {
     /**
      * header中设置token的cookie名字
      */
-    String HEAD_TOKEN_NAME = "x-token";
+    String HEAD_TOKEN_NAME = "X-Token";
     /**
      * header中设置token 分隔符
      */

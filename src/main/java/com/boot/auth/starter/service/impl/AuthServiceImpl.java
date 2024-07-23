@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     CacheService cacheService;
     ObjectMapper objectMapper;
     AuthProperties authProperties;
-    final static String TOKEN_NAME = AuthConstant.HEAD_TOKEN_NAME.toLowerCase();
+    final static String TOKEN_NAME = AuthConstant.HEAD_TOKEN_NAME;
 
     public AuthServiceImpl(CacheService cacheService, ObjectMapper objectMapper, AuthProperties authProperties) {
         this.cacheService = cacheService;
