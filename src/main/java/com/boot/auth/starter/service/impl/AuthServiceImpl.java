@@ -65,9 +65,7 @@ public class AuthServiceImpl implements AuthService {
 
     private void delToken(Map<String, String> oldTokenMap, ServerHttpResponse response, ServerHttpRequest request) {
         if (oldTokenMap.isEmpty() || !oldTokenMap.containsKey(AuthConstant.MAP_KEY_KEY)) return;
-        if (authProperties.getEnableExclude()) {
-            cacheService.remove(authProperties.getTokenPrefix() + oldTokenMap.get(AuthConstant.MAP_KEY_KEY));
-        }
+        cacheService.remove(authProperties.getTokenPrefix() + oldTokenMap.get(AuthConstant.MAP_KEY_KEY));
         delToken(response, request);
     }
 
